@@ -1,0 +1,16 @@
+{
+  "name": "forkify-amiri",
+  "version": "1.0.0",
+  "description": "Recipes for over 1,000,000 food",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abulfazl Amiri",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.16.4",
+    "parcel": "^2.16.4"
+  }
+}
