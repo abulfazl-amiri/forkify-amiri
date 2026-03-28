@@ -9,14 +9,6 @@ import recipeView from "./views/recipeView.js";
 
 const recipeContainer = document.querySelector('.recipe');
 
-const timeout = function (sec) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, sec * 1000);
-  });
-};
-
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
 
@@ -39,5 +31,8 @@ const controlRecipes = async function () {
   }
 };
 
+const init = function () {
+  recipeView.addHandlerRender(controlRecipes);
+};
 
-["load", "hashchange"].forEach(ev => window.addEventListener(ev, controlRecipes));
+init();
