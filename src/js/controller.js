@@ -7,12 +7,10 @@ import "regenerator-runtime/runtime";
 import * as model from "./model.js"
 import recipeView from "./views/recipeView.js";
 
-const recipeContainer = document.querySelector('.recipe');
-
-// NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
 
-///////////////////////////////////////
+const recipeContainer = document.querySelector('.recipe');
+
 
 const controlRecipes = async function () {
   try {
@@ -27,9 +25,18 @@ const controlRecipes = async function () {
     recipeView.render(model.state);
 
   } catch (err) {
-    console.error(err);
+    recipeView.renderErrorMessage();
   }
 };
+const controlSeachResults = async function () {
+  try {
+    await model.loadSearchResults("pizza");
+    console.log(model.state.search.results);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 
 const init = function () {
   recipeView.addHandlerRender(controlRecipes);
