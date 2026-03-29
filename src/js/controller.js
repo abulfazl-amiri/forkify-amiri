@@ -6,6 +6,8 @@ import "regenerator-runtime/runtime";
 
 import * as model from "./model.js"
 import recipeView from "./views/recipeView.js";
+import searchView from "./views/searchView.js";
+import resultsView from "./views/resultsView.js"
 
 // https://forkify-api.jonas.io
 
@@ -17,12 +19,13 @@ const controlRecipes = async function () {
     const id = window.location.hash.slice(1);
     if (!id) return;
 
-    // loading spinner
+    // displaying loading spinner
     recipeView.renderSpinner();
 
-    //// loading
+    // loading
     await model.loadRecipe(id);
-    recipeView.render(model.state);
+    // render the recipe
+    recipeView.render(model.state.recipe);
 
   } catch (err) {
     recipeView.renderErrorMessage();
@@ -30,8 +33,17 @@ const controlRecipes = async function () {
 };
 const controlSeachResults = async function () {
   try {
-    await model.loadSearchResults("pizza");
+    resultsView.renderSpinner();
+    // getting the query 
+    const query = searchView.getQuery();
+    if (!query) return;
+
+    // search && load data for it
+    await model.loadSearchResults(query);
+
+    // render search results 
     console.log(model.state.search.results);
+    resultsView.render(model.state.search.results);
   } catch (err) {
     console.log(err);
   }
@@ -40,6 +52,7 @@ const controlSeachResults = async function () {
 
 const init = function () {
   recipeView.addHandlerRender(controlRecipes);
+  searchView.addHandlerSearch(controlSeachResults);
 };
 
 init();

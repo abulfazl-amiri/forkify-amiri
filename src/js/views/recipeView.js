@@ -1,78 +1,23 @@
 import icons from "url:../../img/icons.svg";
 import { Fraction } from "fractional";
+import View from "./View.js"
 
 
-const RecipeView = class {
-  #parentEl = document.querySelector('.recipe');
-  #data;
-  #errorMessage = "We could not find that recipe, please try another one.";
-  #message = "";
-
-  render(data) {
-    this.#data = data.recipe;
-    const recipeMarkup = this.#generateRecipeMarkup();
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML("afterbegin", recipeMarkup);
-  }
-
-  renderSpinner() {
-    const spinnerEl = `
-      <div class="spinner">
-        <svg>
-          <use href="${icons}#icon-loader"></use>
-        </svg>
-      </div>
-    `;
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML("afterbegin", spinnerEl);
-  };
-
-  renderErrorMessage(message = this.#errorMessage) {
-    const html = `
-      <div class="error">
-        <div>
-          <svg>
-            <use href="${icons}#icon-alert-triangle"></use>
-          </svg>
-        </div>
-        <p>${message}</p>
-      </div>
-    `;
-    this.#clear();
-    this.#parentEl.insertAdjacentHTML("afterbegin", html);
-  }
-
-  renderMessage(message = this.#message) {
-    const html = `
-      <div class="message">
-        <div>
-          <svg>
-            <use href="${icons}#icon-smile"></use>
-          </svg>
-        </div>
-        <p>${message}</p>
-      </div>
-    `;
-    this.#clear();
-    console.log(html);
-    this.#parentEl.insertAdjacentHTML("afterbegin", html);
-  }
+class RecipeView extends View {
+  _parentEl = document.querySelector('.recipe');
+  _errorMessage = "We could not find that recipe, please try another one.";
+  _message = "";
 
 
   addHandlerRender(hanlder) {
     ["load", "hashchange"].forEach(ev => window.addEventListener(ev, hanlder));
   }
-
-  // private methods
-  #clear() {
-    this.#parentEl.innerHTML = "";
-  }
-  #generateRecipeMarkup() {
+  _generateMarkup() {
     return `
           <figure class="recipe__fig">
-            <img src="${this.#data.imgUrl}" alt="${this.#data.title}" class="recipe__img" />
+            <img src="${this._data.imgUrl}" alt="${this._data.title}" class="recipe__img" />
             <h1 class="recipe__title">
-              <span>${this.#data.title}</span>
+              <span>${this._data.title}</span>
             </h1>
           </figure>
 
@@ -81,14 +26,14 @@ const RecipeView = class {
               <svg class="recipe__info-icon">
                 <use href="${icons}#icon-clock"></use>
               </svg>
-              <span class="recipe__info-data recipe__info-data--minutes">${this.#data.cookingTime}</span>
+              <span class="recipe__info-data recipe__info-data--minutes">${this._data.cookingTime}</span>
               <span class="recipe__info-text">minutes</span>
             </div>
             <div class="recipe__info">
               <svg class="recipe__info-icon">
                 <use href="${icons}#icon-users"></use>
               </svg>
-              <span class="recipe__info-data recipe__info-data--people">${this.#data.servings}</span>
+              <span class="recipe__info-data recipe__info-data--people">${this._data.servings}</span>
               <span class="recipe__info-text">servings</span>
 
               <div class="recipe__info-buttons">
@@ -120,7 +65,7 @@ const RecipeView = class {
           <div class="recipe__ingredients">
             <h2 class="heading--2">Recipe ingredients</h2>
             <ul class="recipe__ingredient-list">
-              ${this.#data.ingredients.map(ing => {
+              ${this._data.ingredients.map(ing => {
       return `
                   <li class="recipe__ingredient">
                     <svg class="recipe__icon">
@@ -141,12 +86,12 @@ const RecipeView = class {
       <h2 class="heading--2">How to cook it</h2>
       <p class="recipe__directions-text">
         This recipe was carefully designed and tested by
-        <span class="recipe__publisher">${this.#data.publisher}</span>. Please check out
+        <span class="recipe__publisher">${this._data.publisher}</span>. Please check out
         directions at their website.
       </p>
       <a
         class="btn--small recipe__btn"
-        href="${this.#data.sourceUrl}"
+        href="${this._data.sourceUrl}"
         target="_blank"
       >
         <span>Directions</span>
