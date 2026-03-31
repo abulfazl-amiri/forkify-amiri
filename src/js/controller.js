@@ -1,78 +1,94 @@
-
-// polyfilling 
+// polyfilling
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
-
-import * as model from "./model.js"
+import * as model from "./model.js";
 import recipeView from "./views/recipeView.js";
 import searchView from "./views/searchView.js";
-import resultsView from "./views/resultsView.js"
-import paginationView from "./views/paginationView.js"
+import resultsView from "./views/resultsView.js";
+import paginationView from "./views/paginationView.js";
 
 // https://forkify-api.jonas.io
 
-const recipeContainer = document.querySelector('.recipe');
+const recipeContainer = document.querySelector(".recipe");
 
-if(module.hot){
+if (module.hot) {
   module.hot.accept();
 }
 
 const controlRecipes = async function () {
   const id = window.location.hash.slice(1);
   if (!id) return;
-  // render spinner 
+  // render spinner
   recipeView.renderSpinner();
+
+  // update results view to mark selected from the id in url
+  resultsView.update(model.getSearchResultPage());
 
   // load data
   try {
     await model.loadRecipe(id);
   } catch (err) {
-    console.error("Recipe request failed:", err);
+    console.error("Recipe req uest failed:", err);
     recipeView.renderErrorMessage();
     return;
   }
-  // render data 
+  // render data
   try {
     recipeView.render(model.state.recipe);
   } catch (err) {
     console.error("Recipe render failed:", err);
     recipeView.renderErrorMessage(
-      "Recipe data loaded, but rendering failed. Check the console for the exact error."
+      "Recipe data loaded, but rendering failed. Check the console for the exact error.",
     );
   }
 };
 const controlSeachResults = async function () {
   try {
     resultsView.renderSpinner();
-    // getting the query 
+    // getting the query
     const query = searchView.getQuery();
     if (!query) return;
 
     // search && load data for it
     await model.loadSearchResults(query);
-    
-    
-    // render search results 
+
+    // render search results
     resultsView.render(model.getSearchResultPage());
-    
+
     // paginate the results
     paginationView.render(model.state.search);
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-const controlPagination = function (goToPage){
-    // render search results 
-    resultsView.render(model.getSearchResultPage(goToPage));
-    
-    // paginate the results
-    paginationView.render(model.state.search);
-}
+const controlPagination = function (goToPage) {
+  // render search results
+  resultsView.render(model.getSearchResultPage(goToPage));
+
+  // paginate the results
+  paginationView.render(model.state.search);
+};
+const controlServings = function (newServings) {
+  // update servings in state
+  model.updateServings(newServings);
+
+  // re-render data
+  try {
+    // recipeView.render(model.state.recipe);
+    recipeView.update(model.state.recipe);
+  } catch (err) {
+    console.error("Recipe render failed:", err);
+    recipeView.renderErrorMessage(
+      "Recipe data loaded, but rendering failed. Check the console for the exact error.",
+    );
+  }
+};
 
 const init = function () {
   recipeView.addHandlerRender(controlRecipes);
+  recipeView.addHandlerUpdateServings(controlServings);
   searchView.addHandlerSearch(controlSeachResults);
   searchView.focusSearchInput();
   paginationView.addHandlerClick(controlPagination);

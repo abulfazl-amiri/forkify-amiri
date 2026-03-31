@@ -14,6 +14,38 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", recipeMarkup);
   }
 
+  update(data) {
+    // if (!data || (Array.isArray(data) && data.length === 0)) {
+    //   this.renderErrorMessage();
+    //   return;
+    // }
+
+    this._data = data;
+    const newRecipeMarkup = this._generateMarkup();
+    const newDOM = document
+      .createRange()
+      .createContextualFragment(newRecipeMarkup);
+    const newDOMElements = Array.from(newDOM.querySelectorAll("*"));
+    const curDOMElements = Array.from(this._parentEl.querySelectorAll("*"));
+
+    // look for the exact element
+    newDOMElements.forEach((newEl, i) => {
+      const curEl = curDOMElements[i];
+      if (
+        !curEl.isEqualNode(newEl) &&
+        newEl.firstChild?.nodeValue.trim() !== ""
+      ) {
+        // update element textvalue
+        curEl.textContent = newEl.textContent;
+      }
+      if (!curEl.isEqualNode(newEl)) {
+        Array.from(newEl.attributes).forEach((att) =>
+          curEl.setAttribute(att.name, att.value),
+        );
+      }
+    });
+  }
+
   renderSpinner() {
     const spinnerEl = `
       <div class="spinner">
@@ -24,7 +56,7 @@ export default class View {
     `;
     this._clear();
     this._parentEl.insertAdjacentHTML("afterbegin", spinnerEl);
-  };
+  }
 
   renderErrorMessage(message = this._errorMessage) {
     const html = `
@@ -56,9 +88,7 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", html);
   }
 
-
   _clear() {
     this._parentEl.innerHTML = "";
   }
-
 }

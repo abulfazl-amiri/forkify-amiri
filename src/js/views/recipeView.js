@@ -1,17 +1,28 @@
 import icons from "url:../../img/icons.svg";
 import { Fraction } from "fractional";
-import View from "./View.js"
-
+import View from "./View.js";
 
 class RecipeView extends View {
-  _parentEl = document.querySelector('.recipe');
+  _parentEl = document.querySelector(".recipe");
   _errorMessage = "We could not find that recipe, please try another one.";
   _message = "";
 
-
   addHandlerRender(hanlder) {
-    ["load", "hashchange"].forEach(ev => window.addEventListener(ev, hanlder));
+    ["load", "hashchange"].forEach((ev) =>
+      window.addEventListener(ev, hanlder),
+    );
   }
+
+  addHandlerUpdateServings(hanlder) {
+    this._parentEl.addEventListener("click", function (e) {
+      const btn = e.target.closest(".btn--update-servings");
+      if (!btn) return;
+      const updateTo = +btn.dataset.updateTo;
+      if (updateTo < 1) return;
+      hanlder(updateTo);
+    });
+  }
+
   _generateMarkup() {
     const ingredients = this._data.ingredients ?? [];
 
@@ -39,12 +50,12 @@ class RecipeView extends View {
               <span class="recipe__info-text">servings</span>
 
               <div class="recipe__info-buttons">
-                <button class="btn--tiny btn--increase-servings">
+                <button class="btn--tiny btn--update-servings"  data-update-to=${this._data.servings - 1}>
                   <svg>
                     <use href="${icons}#icon-minus-circle"></use>
                   </svg>
-                </button>
-                <button class="btn--tiny btn--increase-servings">
+                </button> 
+                <button class="btn--tiny btn--update-servings"  data-update-to=${this._data.servings + 1}>
                   <svg>
                     <use href="${icons}#icon-plus-circle"></use>
                   </svg>
@@ -67,8 +78,9 @@ class RecipeView extends View {
           <div class="recipe__ingredients">
             <h2 class="heading--2">Recipe ingredients</h2>
             <ul class="recipe__ingredient-list">
-              ${ingredients.map(ing => {
-      return `
+              ${ingredients
+                .map((ing) => {
+                  return `
                   <li class="recipe__ingredient">
                     <svg class="recipe__icon">
                       <use href="${icons}#icon-check"></use>
@@ -80,7 +92,8 @@ class RecipeView extends View {
                     </div>
                   </li>
                   `;
-    }).join("")}
+                })
+                .join("")}
             </ul >
           </div >
 
@@ -103,7 +116,6 @@ class RecipeView extends View {
       </a>
     </div>
     `;
-
   }
 }
 
