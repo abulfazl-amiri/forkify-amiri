@@ -7,7 +7,7 @@ class SearchView extends View {
     const query = this.#parentEl.querySelector(".search__field").value.trim();
     this.#clearSearchField();
     return query;
-  }
+  }               
   #clearSearchField() {
     this.#parentEl.querySelector(".search__field").value = "";
   }
@@ -16,6 +16,9 @@ class SearchView extends View {
       e.preventDefault();
       handler();
     })
+  }
+  focusSearchInput(){
+    this.#parentEl.querySelector(".search__field").focus();
   }
 
 }

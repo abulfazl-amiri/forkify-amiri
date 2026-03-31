@@ -13,6 +13,8 @@ class RecipeView extends View {
     ["load", "hashchange"].forEach(ev => window.addEventListener(ev, hanlder));
   }
   _generateMarkup() {
+    const ingredients = this._data.ingredients ?? [];
+
     return `
           <figure class="recipe__fig">
             <img src="${this._data.imgUrl}" alt="${this._data.title}" class="recipe__img" />
@@ -65,7 +67,7 @@ class RecipeView extends View {
           <div class="recipe__ingredients">
             <h2 class="heading--2">Recipe ingredients</h2>
             <ul class="recipe__ingredient-list">
-              ${this._data.ingredients.map(ing => {
+              ${ingredients.map(ing => {
       return `
                   <li class="recipe__ingredient">
                     <svg class="recipe__icon">
