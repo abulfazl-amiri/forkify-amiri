@@ -7,6 +7,8 @@ import recipeView from "./views/recipeView.js";
 import searchView from "./views/searchView.js";
 import resultsView from "./views/resultsView.js";
 import paginationView from "./views/paginationView.js";
+import bookmarksView from "./views/bookmarksView.js";
+import addRecipeView from "./views/addRecipeView.js";
 
 // https://forkify-api.jonas.io
 
@@ -24,6 +26,9 @@ const controlRecipes = async function () {
 
   // update results view to mark selected from the id in url
   resultsView.update(model.getSearchResultPage());
+
+  // update bookmarks on each recipe load
+  bookmarksView.update(model.state.bookMarks);
 
   // load data
   try {
@@ -86,12 +91,38 @@ const controlServings = function (newServings) {
   }
 };
 
+const controlAddToBookmarks = function () {
+  model.state.recipe.bookmarked
+    ? model.removeFromBookmarks(model.state.recipe.id)
+    : model.addToBookmarks(model.state.recipe);
+
+  console.log(model.state.recipe);
+  recipeView.update(model.state.recipe);
+
+  // render all bookmarks into bookmark view
+  bookmarksView.render(model.state.bookMarks);
+};
+
+const controlBookmarks = function () {
+  bookmarksView.render(model.state.bookMarks);
+};
+
+const controlAddRecipe = function (newRecipe) {
+  console.log(newRecipe);
+};
+
 const init = function () {
+  bookmarksView.addHandlerRender(controlBookmarks);
+
   recipeView.addHandlerRender(controlRecipes);
   recipeView.addHandlerUpdateServings(controlServings);
+  recipeView.addHandlerBookmark(controlAddToBookmarks);
+
   searchView.addHandlerSearch(controlSeachResults);
   searchView.focusSearchInput();
+
   paginationView.addHandlerClick(controlPagination);
+  addRecipeView.addHandlerUpload(controlAddRecipe);
 };
 
 init();
