@@ -1,5 +1,10 @@
 import { TIMEOUT_SEC } from "./config";
 
+/**
+ * Rejects after the configured timeout so fetch calls do not hang forever.
+ * @param {number} sec
+ * @returns {Promise<never>}
+ */
 const timeout = function (sec) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
@@ -11,6 +16,14 @@ const timeout = function (sec) {
     }, sec * 1000);
   });
 };
+
+/**
+ * Shared request helper for both reading and uploading recipe data.
+ * Sends a GET request by default and a POST request when upload data is given.
+ * @param {string} url
+ * @param {Object} [uploadData]
+ * @returns {Promise<Object>}
+ */
 export const AJAX = async function (url, uploadData = undefined) {
   try {
     const fetchPro = uploadData

@@ -1,4 +1,6 @@
-// polyfilling
+/**
+ * Polyfills keep newer JS features working in older browsers.
+ */
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
@@ -13,25 +15,25 @@ import addRecipeView from "./views/addRecipeView.js";
 
 // https://forkify-api.jonas.io
 
-const recipeContainer = document.querySelector(".recipe");
+// const recipeContainer = document.querySelector(".recipe");
 
 // if (module.hot) {
 //   module.hot.accept();
 // }
 
+/**
+ * Loads the active recipe from the URL hash and updates related UI state.
+ * @returns {Promise<void>}
+ */
 const controlRecipes = async function () {
   const id = window.location.hash.slice(1);
   if (!id) return;
-  // render spinner
+
   recipeView.renderSpinner();
 
-  // update results view to mark selected from the id in url
   resultsView.update(model.getSearchResultPage());
-
-  // update bookmarks on each recipe load
   bookmarksView.update(model.state.bookMarks);
 
-  // load data
   try {
     await model.loadRecipe(id);
   } catch (err) {
@@ -39,7 +41,6 @@ const controlRecipes = async function () {
     recipeView.renderErrorMessage();
     return;
   }
-  // render data
   try {
     recipeView.render(model.state.recipe);
   } catch (err) {
@@ -49,40 +50,42 @@ const controlRecipes = async function () {
     );
   }
 };
+
+/**
+ * Handles search submission, result rendering, and pagination setup.
+ * @returns {Promise<void>}
+ */
 const controlSeachResults = async function () {
   try {
     resultsView.renderSpinner();
-    // getting the query
     const query = searchView.getQuery();
     if (!query) return;
 
-    // search && load data for it
     await model.loadSearchResults(query);
-
-    // render search results
     resultsView.render(model.getSearchResultPage());
-
-    // paginate the results
     paginationView.render(model.state.search);
   } catch (err) {
     console.log(err);
   }
 };
 
+/**
+ * Renders the selected search result page.
+ * @param {number} goToPage
+ */
 const controlPagination = function (goToPage) {
-  // render search results
   resultsView.render(model.getSearchResultPage(goToPage));
-
-  // paginate the results
   paginationView.render(model.state.search);
 };
+
+/**
+ * Updates servings in state and patches the current recipe view.
+ * @param {number} newServings
+ */
 const controlServings = function (newServings) {
-  // update servings in state
   model.updateServings(newServings);
 
-  // re-render data
   try {
-    // recipeView.render(model.state.recipe);
     recipeView.update(model.state.recipe);
   } catch (err) {
     console.error("Recipe render failed:", err);
@@ -92,6 +95,9 @@ const controlServings = function (newServings) {
   }
 };
 
+/**
+ * Toggles bookmark state for the current recipe and refreshes bookmark UI.
+ */
 const controlAddToBookmarks = function () {
   model.state.recipe.bookmarked
     ? model.removeFromBookmarks(model.state.recipe.id)
@@ -100,7 +106,6 @@ const controlAddToBookmarks = function () {
   console.log(model.state.recipe);
   recipeView.update(model.state.recipe);
 
-  // render all bookmarks into bookmark view
   bookmarksView.render(model.state.bookMarks);
 };
 
@@ -108,27 +113,23 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookMarks);
 };
 
+/**
+ * Uploads a new recipe, renders it, and closes the form after success.
+ * @param {Object} newRecipe
+ * @returns {Promise<void>}
+ */
 const controlAddRecipe = async function (newRecipe) {
-  // console.log(newRecipe);
   try {
-    // loading spinner
     addRecipeView.renderSpinner();
-
-    // upload recipe
     await model.uploadRecipe(newRecipe);
 
     bookmarksView.render(model.state.bookMarks);
 
-    // redner recipe into recipe view
     recipeView.render(model.state.recipe);
-
-    // render sucess message
     addRecipeView.renderMessage();
 
-    // change id in url
     window.history.pushState(null, "", `#${model.state.recipe.id}`);
 
-    // close form
     setTimeout(function () {
       addRecipeView.closeWindow();
     }, MODAL_CLOSE_DELAY_SEC * 1000);
@@ -140,6 +141,9 @@ const controlAddRecipe = async function (newRecipe) {
   }
 };
 
+/**
+ * Wires view events to their controller handlers during app startup.
+ */
 const init = function () {
   bookmarksView.addHandlerRender(controlBookmarks);
 

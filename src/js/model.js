@@ -2,6 +2,9 @@ import { async } from "regenerator-runtime";
 import { API_URL, RESULTS_PER_PAGE, API_KEY } from "./config.js";
 import { AJAX } from "./helpers.js";
 
+/**
+ * Central app state shared between the controller and all views.
+ */
 export const state = {
   recipe: {},
   search: {
@@ -13,8 +16,12 @@ export const state = {
   bookMarks: [],
 };
 
+/**
+ * Maps the API response shape to the structure used across the app.
+ * @param {Object} data
+ * @returns {Object}
+ */
 const createRecipeObject = function (data) {
-  // buidling the objc
   const { recipe } = data.data;
   return {
     id: recipe.id,
@@ -31,14 +38,16 @@ const createRecipeObject = function (data) {
   };
 };
 
+/**
+ * Loads one recipe by id and syncs its bookmark status with local state.
+ * @param {string} id
+ * @returns {Promise<void>}
+ */
 export const loadRecipe = async function (id) {
   try {
     const data = await AJAX(`${API_URL}/${id}`);
     state.recipe = createRecipeObject(data);
 
-    // check wether the recipe that is loaded is in bookmark list
-    // if yes -> bookmark = true
-    // else -> bookmark = false
     if (state.bookMarks.some((bookmark) => bookmark.id === id)) {
       state.recipe.bookmarked = true;
     } else {
@@ -52,6 +61,11 @@ export const loadRecipe = async function (id) {
   }
 };
 
+/**
+ * Fetches search results and stores the normalized list in state.
+ * @param {string} query
+ * @returns {Promise<void>}
+ */
 export const loadSearchResults = async function (query) {
   try {
     state.search.query = query;
@@ -73,6 +87,12 @@ export const loadSearchResults = async function (query) {
     throw err;
   }
 };
+
+/**
+ * Returns only the search results needed for the requested page.
+ * @param {number} [pageNum=state.search.currentPage]
+ * @returns {Object[]|undefined}
+ */
 export const getSearchResultPage = function (
   pageNum = state.search.currentPage,
 ) {
@@ -84,6 +104,10 @@ export const getSearchResultPage = function (
   return state.search.results.slice(start, end);
 };
 
+/**
+ * Recalculates ingredient quantities when servings change.
+ * @param {number} newServings
+ */
 export const updateServings = function (newServings) {
   state.recipe.ingredients.forEach((ing) => {
     // newQuantity = oldQuantity * newServings / numOldServings
@@ -97,6 +121,10 @@ const presistBookmarks = function () {
   localStorage.setItem("bookmarks", JSON.stringify(state.bookMarks));
 };
 
+/**
+ * Saves a recipe to bookmarks if it is not already there.
+ * @param {Object} recipe
+ */
 export const addToBookmarks = function (recipe) {
   // check if already bookmarked
   if (state.bookMarks.some((bookmark) => recipe.id === bookmark.id)) return;
@@ -110,6 +138,10 @@ export const addToBookmarks = function (recipe) {
   presistBookmarks();
 };
 
+/**
+ * Removes a recipe from bookmarks by id.
+ * @param {string} id
+ */
 export const removeFromBookmarks = function (id) {
   const index = state.bookMarks.findIndex((bookmark) => bookmark.id === id);
   if (index === -1) return;
@@ -133,13 +165,17 @@ export const clearBookMarks = function () {
 
 // clearBookMarks();
 
+/**
+ * Parses the upload form data, sends it to the API, and stores the new recipe.
+ * Ingredient fields must use the format "quantity,unit,description".
+ * @param {Object} newRecipe
+ * @returns {Promise<void>}
+ */
 export const uploadRecipe = async function (newRecipe) {
-  // console.log(newRecipe);
   try {
     const ingredients = Object.entries(newRecipe)
       .filter((entry) => entry[0].startsWith("ingredient") && entry[1] !== "")
       .map((ing) => {
-        // const ingArr = ing[1].replaceAll(" ", "").split(",");
         const ingArr = ing[1].split(",").map((el) => el.trim());
         if (ingArr.length !== 3)
           throw new Error(

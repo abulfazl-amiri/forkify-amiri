@@ -6,4 +6,5 @@ Just a learning project based on [https://forkify-v2.jonas.io/](https://forkify-
 
 What I added:
 
-- some features...
+- auto focus on search field on load/reload
+- added docs for better readiblity and undrestanding how things works

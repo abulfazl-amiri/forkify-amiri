@@ -1,11 +1,20 @@
 {
   "name": "forkify-amiri",
   "version": "1.0.0",
-  "description": "Recipes for over 1,000,000 food",
+  "description": "A recipe search and bookmarking app built with Parcel.",
+  "private": true,
+  "keywords": [
+    "parcel",
+    "javascript",
+    "recipes",
+    "frontend",
+    "forkify"
+  ],
   "scripts": {
+    "dev": "parcel index.html",
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests configured\""
   },
   "author": "Abulfazl Amiri",
   "license": "ISC",

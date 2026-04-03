@@ -1,7 +1,17 @@
 import icons from "url:../../img/icons.svg";
 
+/**
+ * Base view class with shared render/update helpers for all UI sections.
+ */
 export default class View {
   _data;
+
+  /**
+   * Renders markup into the target element or returns it as a string.
+   * @param {Object|Object[]} data
+   * @param {boolean} [render=true]
+   * @returns {string|void}
+   */
   render(data, render = true) {
     if (!data || (Array.isArray(data) && data.length === 0)) {
       this.renderErrorMessage();
@@ -16,12 +26,11 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", recipeMarkup);
   }
 
+  /**
+   * Patches only changed text and attributes instead of replacing the full view.
+   * @param {Object|Object[]} data
+   */
   update(data) {
-    // if (!data || (Array.isArray(data) && data.length === 0)) {
-    //   this.renderErrorMessage();
-    //   return;
-    // }
-
     this._data = data;
     const newRecipeMarkup = this._generateMarkup();
     const newDOM = document
@@ -30,7 +39,6 @@ export default class View {
     const newDOMElements = Array.from(newDOM.querySelectorAll("*"));
     const curDOMElements = Array.from(this._parentEl.querySelectorAll("*"));
 
-    // look for the exact element
     newDOMElements.forEach((newEl, i) => {
       const curEl = curDOMElements[i];
       if (
@@ -48,6 +56,9 @@ export default class View {
     });
   }
 
+  /**
+   * Shows the shared loading spinner markup.
+   */
   renderSpinner() {
     const spinnerEl = `
       <div class="spinner">
@@ -60,6 +71,10 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", spinnerEl);
   }
 
+  /**
+   * Shows an error state inside the view.
+   * @param {string} [message=this._errorMessage]
+   */
   renderErrorMessage(message = this._errorMessage) {
     const html = `
       <div class="error">
@@ -75,6 +90,10 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", html);
   }
 
+  /**
+   * Shows a success or neutral message inside the view.
+   * @param {string} [message=this._message]
+   */
   renderMessage(message = this._message) {
     const html = `
       <div class="message">
