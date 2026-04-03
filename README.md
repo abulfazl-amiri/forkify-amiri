@@ -8,3 +8,4 @@ What I added:
 
 - auto focus on search field on load/reload
 - added docs for better readiblity and undrestanding how things works
+- created a helper method instead of using the old lib due to incomatiblity and bugs
